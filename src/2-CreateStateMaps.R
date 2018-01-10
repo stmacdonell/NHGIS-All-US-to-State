@@ -5,12 +5,20 @@ States <- unique(US@data$STATE)[order(unique(US@data$STATE))]
 dir.create("StateMaps")
 
 library(doParallel)
-registerDoParallel(cores=2)
-foreach(i = 1:length(States) %dopar% {
+registerDoParallel(cores=5)
+
+start <- proc.time()
+temp <- foreach(i = 1:length(States)) %dopar% {
   StateMap = US[US@data$STATE==States[i],]
   save(StateMap, file = paste0("StateMaps/",States[i],".Rdata"))
-  })
+  i
+  }
 
+rm(temp)
+
+end <- proc.time()
+
+end-start
 
 
 
