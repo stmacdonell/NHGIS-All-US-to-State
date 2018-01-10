@@ -4,10 +4,20 @@ States <- unique(US@data$STATE)[order(unique(US@data$STATE))]
 
 dir.create("StateMaps")
 
-for(i in 1:length(States)) {
+library(doParallel)
+registerDoParallel(cores=2)
+foreach(i = 1:length(States) %dopar% {
   StateMap = US[US@data$STATE==States[i],]
   save(StateMap, file = paste0("StateMaps/",States[i],".Rdata"))
-}
+  })
+
+
+
+
+# for(i in 1:length(States)) {
+#   StateMap = US[US@data$STATE==States[i],]
+#   save(StateMap, file = paste0("StateMaps/",States[i],".Rdata"))
+# }
 
 unlink("data/cache/", recursive=TRUE)
 

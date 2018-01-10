@@ -1,5 +1,5 @@
-csvfile <- "data/raw/nhgis0017_csv.zip"
-shapefile <- "data/raw/nhgis0017_shape.zip"
+csvfile <- "data/raw/nhgis0020_csv.zip"
+shapefile <- "data/raw/nhgis0020_shape.zip"
 
 dir.create("data/cache")
 dir.create("data/cache/csv")
@@ -35,12 +35,22 @@ csvfile <- csvfile[[2]]
 #csv data
 USdata <- read.csv(csvfile,stringsAsFactors = FALSE)
 
+rm(csvfile)
+rm(shapefile)
+
 #save(USdata,file="data/cache/USdata.RData")
 
 #which rows in the data are on the map
-onMap <- sapply(USdata$GISJOIN, FUN=function(x){
+# onMap <- sapply(USdata$GISJOIN, FUN=function(x){
+#   x%in%US@data$GISJOIN
+#   })
+
+library(parallel)
+onMap <- mclapply(USdata$GISJOIN, FUN=function(x){
   x%in%US@data$GISJOIN
-  })
+}, mc.cores = 2)
+onMap <- unlist(onMap)
+
 
 #verify no one lives in unmatched polygons
 sum(USdata$H7Q001[!onMap])
